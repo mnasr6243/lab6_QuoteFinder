@@ -1,0 +1,58 @@
+<%- include("partials/header.ejs") %>
+
+<body class="text-center">
+    <h1 class="bg-primary text-white p-4">Famous Quotes</h1>
+
+     <h1> Famous Quotes - Admin Section </h1>
+
+    <form action="/addAuthor">
+        <button> New Author </button>
+    </form>
+
+
+    <div>
+        <form action="/searchByKeyWord" method="GET">
+            <label>Keyword: <input type="text" name="keyword"></label>
+            <button class="btn btn-outline-success">Search</button>
+        </form>
+
+        <form action="/searchByLikes" method="GET">
+            <label>Likes Range: <input type="number" name="Likes"></label>
+            <button class="btn btn-outline-success">Search</button>
+        </form>
+
+        <form action="/searchByAuthor" method="GET">
+            <label>Author:
+                <select name="authorId">
+                    <% for (let i of authorsRows) { %>
+                        <option value="<%= i.authorId %>"><%= i.firstName %> <%= i.lastName %></option>
+                    <% } %>
+                </select>
+            </label>
+            <button class="btn btn-outline-success">Search</button>
+        </form>
+    </div>
+
+    <form action="/allQuotesAlphabetical">
+        <button>All Quotes Alphabetical</button>
+    </form>
+
+    <form action="/quotesAboutLife">
+        <button>Quotes About Life</button>
+    </form>
+
+    <form action="/quotes50_100">
+        <button>Quotes With Likes Between 50-100</button>
+    </form>
+   
+    <form action="/top3Quotes">
+        <button>Top 3 Quotes</button>
+    </form>
+    
+    <form action="/authorPics">
+        <button>Author Portraits</button>
+    </form>
+
+    <%- include("partials/footer.ejs") %>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<%- include("partials/header.ejs") %>
+
+<body class="text-center">
+    <h1 class="bg-primary text-white p-4">Quotes Like Range</h1>
+
+
+    <% for (let i of rows) {%>
+        "<%=i.quote%>"<br>
+        <a class="authors" href="#" authorId="<%=i.authorId%>"> <%=i.firstName%> <%=i.lastName%></a>
+        <br><hr>
+    <% } %>
+
+
+    <%- include("partials/footer.ejs")%>
+</body>
+
+</html>

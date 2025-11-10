@@ -1,0 +1,49 @@
+/* Layout for full-height pages */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Main content takes remaining height */
+main {
+    flex: 1;
+}
+
+/* Ensure images and sections resize proportionally */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Footer sticks to the bottom */
+footer {
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    background: linear-gradient(to bottom, black, red);
+    box-shadow: 0px -5px 15px black;
+    margin-top: auto;
+}
+
+/* Keep content nicely centered and balanced */
+.row {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+ul, li, h6, p {
+    word-wrap: break-word;
+}
+
+/* Responsive text and spacing to adjust better on mobile*/
+h1, h2, h3, h4, h5, h6, p {
+    max-width: 100%;
+    word-break: break-word;
+}
+
+@media (max-width: 768px) {
+    .p-5 { padding: 2rem !important; }
+    h1 { font-size: 1.75rem; }
+}
