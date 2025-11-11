@@ -45,37 +45,41 @@ app.get('/', async (req, res) => {
     }
 });
 
-// Search by keyword route
+// Search by keyword route (validated for >= 3 characters)
 app.get('/searchByKeyWord', async (req, res) => {
-    // console.log(req);
-    let keyword = req.query.keyword;
-    let sql = `SELECT authorId, firstName, lastName, quote FROM authors NATURAL JOIN quotes WHERE quote LIKE ?`;
-    let sqlParams = [`%${keyword}%`];
-    const [rows] = await pool.query(sql, sqlParams);
-    // console.log(rows);
-    res.render('results.ejs', { rows });
+   try {
+    const keyword = (req.query.keyword || '').trim();
+    const { authors, categories } = await getAuthorsAndCategories();
+    
+    if (keyword.length < 3) {
+        return res.render('home.ejs', { 
+            authors, categories,
+            error: "Please enter at least 3 characters for the keyword search."
+        });
+    }
+
+    const [rows] = await pool.query(`
+        SELECT
+            q.quote_id AS quoteId,
+            q.quote AS quote,
+            q.likes AS likes,
+            a.author_id AS authorId,
+            a.first_name AS firstName,
+            a.last_name AS lastName,
+        FROM quotes q
+        JOIN authors a ON q.author_id = a.author_id
+        WHERE q.quote LIKE ?
+        ORDER BY q.likes DESC, q.quote ASC
+        `, [`%${keyword}%`]);
+
+    res.render('results.ejs', { rows, title: `Results for "${keyword}"` });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server error; Error searching by keyword.");
+    }
 });
 
-// Stores new author data into the database
-app.post('/addAuthor', async (req, res) => {
-    let firstName = req.body.fn;
-    let lastName = req.body.ln;
-    let dob = req.body.dob;
-    let dod = req.body.dod;
-    let sql = `INSERT INTO authors 
-            (first_name, last_name, dob, dod) 
-            VALUES (?, ?, ?, ?)`;
-    let sqlParams = [firstName, lastName, dob, dod];
-    const [rows] = await pool.query(sql, sqlParams);
-    res.render('addAuthor.ejs');
-});
-
-// Displays form to add new book
-app.get('/addBook', (req, res) => {
-   res.render
-});
-
-// Search by author route
+// Author search route
 app.get('/searchByAuthor' , async (req, res) => {
     let authorId = req.query.authorId;
     let sql = `SELECT authorId , firstName , lastName , quote FROM authors NATURAL JOIN quotes WHERE authorID = ?`;
