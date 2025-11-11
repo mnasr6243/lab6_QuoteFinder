@@ -36,15 +36,24 @@ async function getAuthorsAndCategories() {
 
 //Home route - Show search UI & dropdowns from database
 app.get('/', async (req, res) => {
-    let authorsSQL = `SELECT authorId , firstName , lastName FROM authors`;
-    const [authorsRows] = await pool.query(authorsSQL);
-    // console.log(authorsRows);
-    res.render('home.ejs', { authorsRows });
+    try {
+        const { authors, categories } = await getAuthorsAndCategories();
+        res.render('home.ejs', { authors, categories, error: null });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server error; Error loading home page.");
+    }
 });
 
-// Displays form to add new author
-app.get('/addAuthor', (req, res) => {
-   res.render('addAuthor.ejs');
+// Search by keyword route
+app.get('/searchByKeyWord', async (req, res) => {
+    // console.log(req);
+    let keyword = req.query.keyword;
+    let sql = `SELECT authorId, firstName, lastName, quote FROM authors NATURAL JOIN quotes WHERE quote LIKE ?`;
+    let sqlParams = [`%${keyword}%`];
+    const [rows] = await pool.query(sql, sqlParams);
+    // console.log(rows);
+    res.render('results.ejs', { rows });
 });
 
 // Stores new author data into the database
@@ -64,17 +73,6 @@ app.post('/addAuthor', async (req, res) => {
 // Displays form to add new book
 app.get('/addBook', (req, res) => {
    res.render
-});
-
-// Search by keyword route
-app.get('/searchByKeyWord', async (req, res) => {
-    // console.log(req);
-    let keyword = req.query.keyword;
-    let sql = `SELECT authorId, firstName, lastName, quote FROM authors NATURAL JOIN quotes WHERE quote LIKE ?`;
-    let sqlParams = [`%${keyword}%`];
-    const [rows] = await pool.query(sql, sqlParams);
-    // console.log(rows);
-    res.render('results.ejs', { rows });
 });
 
 // Search by author route
