@@ -162,12 +162,38 @@ app.get('/searchByLikes', async (req, res) => {
     }
 });
 
-// local API to get all info for a specific author
+// local API to get all info for a specific author (all author info in a modal)
 app.get('/api/authorInfo/:id', async (req, res) => {
-    let authorId = req.params.id;
-    let sql = `SELECT * FROM q_authors WHERE authorId = ?`;           
-    let [rows] = await conn.query(sql, [authorId]);
-    res.send(rows)
+    try {
+        const authorId = req.params.id;
+
+        const [info] = await pool.query(`
+            SELECT
+                a.author_id AS authorId,
+                a.first_name AS firstName,
+                a.last_name AS lastName,
+                a.dob AS dob,
+                a.dod AS dod,
+                a.portrait AS portrait,
+                a.bio AS bio
+            FROM authors a
+            WHERE a.author_id = ?
+            LIMIT 1
+        `, [authorId]);
+
+        if (info.length === 0) return res.status(404).json({ error: "Author not found" });
+
+        const [count] = await pool.query(`
+            SELECT COUNT(*) AS quoteCount
+            FROM quotes
+            WHERE author_id = ?
+        `, [authorId]);
+
+        res.json({ ...info[0], quotesCount: count[0]?.quotesCount ?? 0 });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error; Error fetching author info." });
+    }
 });
 
 // Database connection test route
