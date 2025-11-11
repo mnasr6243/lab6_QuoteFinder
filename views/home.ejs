@@ -1,62 +1,76 @@
 <%- include("partials/header.ejs") %>
 
-<body class="text-center">
-    <h1 class="bg-primary text-white p-4">Famous Quotes</h1>
+<main class="container py-4">
+  <h1 class="display-5 fw-semibold text-center mb-4">Famous Quotes</h1>
 
-    <div class="searchQueries">
-        <form action="/searchByKeyWord" method="GET">
-            <label>Keyword: <input type="text" name="keyword"></label>
-            <button class="btn btn-outline-success">Search</button>
-        </form>
+  <% if (error) { %>
+    <div class="alert alert-danger text-center" role="alert"><%= error %></div>
+  <% } %>
 
-        <form action="/searchByLikes" method="GET">
-            <label>Likes Range: <input type="number" name="Likes"></label>
-            <button class="btn btn-outline-success">Search</button>
-        </form>
+  <section class="card shadow-sm mx-auto mb-4" style="max-width: 900px;">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Search</h2>
 
-        <form action="/searchByAuthor" method="GET">
-            <label>Author:
-                <select name="authorId">
-                    <% for (let i of authorsRows) { %>
-                        <option value="<%= i.authorId %>"><%= i.firstName %> <%= i.lastName %></option>
-                    <% } %>
-                </select>
-            </label>
-            <button class="btn btn-outline-success">Search</button>
-        </form>
+      <!-- Keyword -->
+      <form id="keywordForm" class="row gy-2 gx-2 align-items-center mb-3" action="/searchByKeyword" method="GET" novalidate>
+        <div class="col-12 col-md">
+          <label class="form-label" for="keyword">Keyword</label>
+          <input class="form-control" type="text" id="keyword" name="keyword" placeholder="e.g. life, courage" required minlength="3" />
+          <div class="form-text">At least 3 characters.</div>
+        </div>
+        <div class="col-12 col-md-auto">
+          <label class="invisible d-block form-label">&nbsp;</label>
+          <button class="btn btn-success w-100">Search</button>
+        </div>
+      </form>
+
+      <!-- Likes range -->
+      <form class="row gy-2 gx-2 align-items-end mb-3" action="/searchByLikes" method="GET">
+        <div class="col-6 col-md">
+          <label class="form-label" for="min">Min Likes</label>
+          <input class="form-control" type="number" id="min" name="min" min="0" placeholder="0" />
+        </div>
+        <div class="col-6 col-md">
+          <label class="form-label" for="max">Max Likes</label>
+          <input class="form-control" type="number" id="max" name="max" min="0" placeholder="100" />
+        </div>
+        <div class="col-12 col-md-auto">
+          <button class="btn btn-outline-success w-100">Filter</button>
+        </div>
+      </form>
+
+      <!-- Author -->
+      <form class="row gy-2 gx-2 align-items-end mb-3" action="/searchByAuthor" method="GET">
+        <div class="col-12 col-md">
+          <label class="form-label" for="authorId">Author</label>
+          <select class="form-select" id="authorId" name="authorId">
+            <% (authors || []).forEach(a => { %>
+              <option value="<%= a.authorId %>"><%= a.firstName %> <%= a.lastName %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="col-12 col-md-auto">
+          <button class="btn btn-outline-primary w-100">Search</button>
+        </div>
+      </form>
+
+      <!-- Category -->
+      <form class="row gy-2 gx-2 align-items-end" action="/searchByCategory" method="GET">
+        <div class="col-12 col-md">
+          <label class="form-label" for="category">Category</label>
+          <select class="form-select" id="category" name="category">
+            <% (categories || []).forEach(cat => { %>
+              <option value="<%= cat %>"><%= cat %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="col-12 col-md-auto">
+          <button class="btn btn-outline-primary w-100">Search</button>
+        </div>
+      </form>
     </div>
+  </section>
+</main>
 
-    <h1 class="bg-primary text-white p-4">Quote Facts</h1>
-        <div class="quoteFacts">
-            <form action="/allQuotesAlphabetical">
-                <button>All Quotes Alphabetical</button>
-            </form>
-
-            <form action="/quotesAboutLife">
-                <button>Quotes About Life</button>
-            </form>
-
-            <form action="/quotes50_100">
-                <button>Quotes With Likes Between 50-100</button>
-            </form>
-        
-            <form action="/top3Quotes">
-                <button>Top 3 Quotes</button>
-            </form>
-            
-            <form action="/authorPics">
-                <button>Author Portraits</button>
-            </form>
-        </div>
-
-     
-    <h1 class="bg-primary text-white p-4"> Famous Quotes - Admin Section </h1>
-        <div class="quoteAdmin"></div>
-            <form action="/addAuthor">
-                <button> New Author </button>
-            </form>
-        </div>
-
-    <%- include("partials/footer.ejs") %>
-</body>
-</html>
+<%- include("partials/footer.ejs") %>
+<%- include("partials/script.ejs") %>

@@ -1,61 +1,38 @@
-/* Layout for full-height pages */
-html, body {
-    height: 100%;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
+/* Typography & spacing */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Main content takes remaining height */
-main {
-    flex: 1;
+.card blockquote p {
+  font-size: 1.05rem;
 }
 
-.searchQueries {
-    margin-top: 1rem;
+.navbar-brand {
+  letter-spacing: 0.2px;
 }
 
-.quoteAdmin {
-    margin-top: 2rem;
+/* Buttons */
+.btn {
+  border-radius: 999px;
 }
 
-.quoteFacts {
-    margin-top: 1rem;
+/* Cards */
+.card {
+  border-radius: 1rem;
 }
 
-/* Ensure images and sections resize proportionally */
-img {
-    max-width: 100%;
-    height: auto;
+/* Forms */
+.form-control, .form-select {
+  border-radius: 0.75rem;
 }
 
-/* Footer sticks to the bottom */
-footer {
-    color: white;
-    text-align: center;
-    padding: 1rem;
-    background: linear-gradient(to bottom, black, red);
-    box-shadow: 0px -5px 15px black;
-    margin-top: auto;
+/* Modal image fallback */
+#authorImg {
+  background: #f2f2f2;
 }
 
-/* Keep content nicely centered and balanced */
-.row {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-ul, li, h6, p {
-    word-wrap: break-word;
-}
-
-/* Responsive text and spacing to adjust better on mobile*/
-h1, h2, h3, h4, h5, h6, p {
-    max-width: 100%;
-    word-break: break-word;
-}
-
-@media (max-width: 768px) {
-    .p-5 { padding: 2rem !important; }
-    h1 { font-size: 1.75rem; }
+/* Small helpers */
+.container {
+  max-width: 1100px;
 }

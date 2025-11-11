@@ -1,0 +1,75 @@
+<!-- Bootstrap Bundle (includes Popper) -->
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+  crossorigin="anonymous"></script>
+
+<script>
+// Footer year (if present in footer.ejs)
+document.getElementById('year')?.append(new Date().getFullYear());
+
+// Client-side guard for keyword length (keeps UX snappy; server also validates)
+document.getElementById('keywordForm')?.addEventListener('submit', function (e) {
+  const kw = document.getElementById('keyword')?.value?.trim() || '';
+  if (kw.length < 3) {
+    e.preventDefault();
+    // Inline alert for quick feedback
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-danger mt-3';
+    alert.role = 'alert';
+    alert.textContent = 'Keyword must be at least 3 characters.';
+    // Avoid duplicates
+    const container = this.closest('.card-body');
+    if (!container.querySelector('.alert-danger')) container.appendChild(alert);
+    document.getElementById('keyword')?.focus();
+  }
+});
+
+// Results page author modal logic (runs harmlessly on home if elements not present)
+(function () {
+  const modalEl = document.getElementById('authorModal');
+  if (!modalEl) return;
+
+  const modal = new bootstrap.Modal(modalEl);
+
+  document.querySelectorAll('.author-link').forEach(link => {
+    link.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const authorId = link.dataset.authorId;
+      if (!authorId) return;
+
+      try {
+        const res = await fetch(`/api/authorInfo/${authorId}`);
+        if (!res.ok) throw new Error('Failed to fetch author info');
+        const a = await res.json();
+
+        const fullName = [a.firstName, a.lastName].filter(Boolean).join(' ') || 'Author';
+        const dob = a.dob ? new Date(a.dob).toISOString().slice(0,10) : null;
+        const dod = a.dod ? new Date(a.dod).toISOString().slice(0,10) : null;
+
+        document.getElementById('authorModalLabel').textContent = fullName;
+        document.getElementById('authorName').textContent = fullName;
+
+        let dateText = '';
+        if (dob && dod) dateText = `${dob} — ${dod}`;
+        else if (dob) dateText = `Born ${dob}`;
+        else if (dod) dateText = `Died ${dod}`;
+        document.getElementById('authorDates').textContent = dateText;
+
+        const img = document.getElementById('authorImg');
+        if (a.portrait) { img.src = a.portrait; img.alt = `${fullName} portrait`; }
+        else { img.removeAttribute('src'); img.alt = 'Portrait unavailable'; }
+
+        document.getElementById('authorBio').textContent = a.biography || 'No biography available.';
+        document.getElementById('authorCounts').textContent =
+          typeof a.quotesCount === 'number' ? `Quotes in database: ${a.quotesCount}` : '';
+
+        modal.show();
+      } catch (err) {
+        console.error(err);
+        alert('Could not load author info.');
+      }
+    });
+  });
+})();
+</script>
