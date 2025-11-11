@@ -81,13 +81,29 @@ app.get('/searchByKeyWord', async (req, res) => {
 
 // Author search route
 app.get('/searchByAuthor' , async (req, res) => {
-    let authorId = req.query.authorId;
-    let sql = `SELECT authorId , firstName , lastName , quote FROM authors NATURAL JOIN quotes WHERE authorID = ?`;
-    let sqlParams = [`${authorId}`];
-    const [rows] = await pool.query(sql, sqlParams);
-    console.log(rows);
+    try {
+        const id = req.query.authorId;
+        if (!id) return res.redirect('/');
 
-    res.render('results.ejs' , { rows })
+        const [rows] = await pool.query(`
+            SELECT
+                q.quote_id AS quoteId,
+                q.quote AS quote,
+                q.likes AS likes,
+                a.author_id AS authorId,
+                a.first_name AS firstName,
+                a.last_name AS lastName
+            FROM quotes q
+            JOIN authors a ON q.author_id = a.author_id
+            WHERE a.author_id = ?
+            ORDER BY q.likes DESC, q.quote ASC
+        `, [id]);
+
+        res.render('results.ejs', { rows, title: 'Results by Author' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server error; Error searching by author.");
+    }
 });
 
 // Quotes between user input range route
