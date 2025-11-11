@@ -135,6 +135,32 @@ app.get("/searchByCategory", async (req, res) => {
     }
 });
 
+// Likes search range route (min-max)
+app.get('/searchByLikes', async (req, res) => {
+    try {
+        const min = Numnber.isFinite(+req.query.min) ? +req.query.min : 0;
+        const max = Numnber.isFinite(+req.query.max) ? +req.query.max : Number.MAX_SAFE_INTEGER;
+
+        const [rows] = await pool.query(`
+            SELECT
+                q.quote_id AS quoteId,
+                q.quote AS quote,
+                q.likes AS likes,
+                a.author_id AS authorId,
+                a.first_name AS firstName,
+                a.last_name AS lastName
+            FROM quotes q
+            JOIN authors a ON q.author_id = a.author_id
+            WHERE q.likes BETWEEN ? AND ?
+            ORDER BY q.likes DESC, q.quote ASC
+        `, [min, max]);
+
+        res.render('results.ejs', { rows, title: `Results with Likes between ${min} - ${max}` });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server error; Error searching by likes range.");
+    }
+});
 
 // local API to get all info for a specific author
 app.get('/api/authorInfo/:id', async (req, res) => {
