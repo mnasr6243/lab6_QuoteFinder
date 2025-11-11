@@ -2,7 +2,6 @@ import express from 'express';
 import mysql from 'mysql2/promise';
 
 const app = express();
-
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
@@ -24,7 +23,6 @@ app.get('/', async (req, res) => {
     let authorsSQL = `SELECT authorId , firstName , lastName FROM authors`;
     const [authorsRows] = await pool.query(authorsSQL);
     // console.log(authorsRows);
-
     res.render('home.ejs', { authorsRows });
 });
 
@@ -56,19 +54,16 @@ app.get('/addBook', (req, res) => {
 app.get('/searchByKeyWord', async (req, res) => {
     // console.log(req);
     let keyword = req.query.keyword;
-
     let sql = `SELECT authorId, firstName, lastName, quote FROM authors NATURAL JOIN quotes WHERE quote LIKE ?`;
     let sqlParams = [`%${keyword}%`];
     const [rows] = await pool.query(sql, sqlParams);
     // console.log(rows);
-
     res.render('results.ejs', { rows });
 });
 
 // Search by author route
 app.get('/searchByAuthor' , async (req, res) => {
     let authorId = req.query.authorId;
-
     let sql = `SELECT authorId , firstName , lastName , quote FROM authors NATURAL JOIN quotes WHERE authorID = ?`;
     let sqlParams = [`${authorId}`];
     const [rows] = await pool.query(sql, sqlParams);
@@ -82,21 +77,19 @@ app.get("/quotesRange.ejs", async(req, res) => {
 
     let sql = "SELECT quoteId, quote, likes FROM `quotes` WHERE likes BETWEEN ? AND ? ORDER BY likes ASC;";
     let sqlParams = [`${range1}`, `${range2}`];
-    const [row] = await conn.query(sql);
-
+    const [row] = await pool.query(sql);
     res.render("quotesRange.ejs", {result: row} );
 });
 
 
 // local API to get all info for a specific author
-app.get('/api/authorInfo/:authorId', async (req, res) => {
-    let authorId = req.params.authorId;
-
-    let sql = `SELECT * FROM authors WHERE authorId = ?`;
-    const [rows] = await pool.query(sql, [authorId]);
-
-    res.send(rows);
+app.get('/api/authorInfo/:id', async (req, res) => {
+    let authorId = req.params.id;
+    let sql = `SELECT * FROM q_authors WHERE authorId = ?`;           
+    let [rows] = await conn.query(sql, [authorId]);
+    res.send(rows)
 });
+
 
 // Author Portraits route
 app.get('/authorPics', async (req, res) => {

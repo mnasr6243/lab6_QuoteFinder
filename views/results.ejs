@@ -29,10 +29,11 @@
 
 
     <script>
-        let authors = document.querySelectorAll(".authors");
+        // Attach event listeners to author links
+        let authorLinks = document.querySelectorAll(".authors");
 
-        for (let i of authors) {
-            authors.addEventListener("click" , getAuthorInfo);
+        for (authorLink of authorLinks) {
+            authorLinks.addEventListener("click" , getAuthorInfo);
         }
 
         function $(selector) {
@@ -40,11 +41,11 @@
         }
 
         async function getAuthorInfo() {
-            let authorId = this.getAttribute("authorId");
-            let url = "api/authorInfo/" + authorId;
+            let url = `/api/authorInfo/${this.id}`;
             let response = await fetch(url);
             let data = await response.json();
-            console.log(data);
+            // console.log(data);
+            let authorInfo = $("#authorInfo");
             $("#authorName").textContent = data[0].firstName + " " + data[0].lastName;
             $("#authorImg").src = data[0].portrait;
         }
