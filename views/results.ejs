@@ -4,9 +4,22 @@
     <h1 class="bg-primary text-white p-4">Famous Quotes</h1>
 
     <% for (let i of rows) {%>
-        "<%=i.quote%>"<br>
-        <a class="authors" href="#" authorId="<%=i.authorId%>"> <%=i.firstName%> <%=i.lastName%></a>
-        <br><hr>
+        <div class="card">
+        <div class="card-header">
+            Quote
+        </div>
+        <div class="card-body">
+            <figure>
+            <blockquote class="blockquote">
+                <p>"<%=i.quote%>"</p>
+            </blockquote>
+            <figcaption class="blockquote-footer">
+                <a class="authors" href="#" authorId="<%=i.authorId%>"> <%=i.firstName%> <%=i.lastName%></a>
+            </figcaption>
+            </figure>
+        </div>
+        </div>       
+        <br>
     <% } %>
 
     <div id="authorInfo">

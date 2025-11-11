@@ -11,6 +11,18 @@ main {
     flex: 1;
 }
 
+.searchQueries {
+    margin-top: 1rem;
+}
+
+.quoteAdmin {
+    margin-top: 2rem;
+}
+
+.quoteFacts {
+    margin-top: 1rem;
+}
+
 /* Ensure images and sections resize proportionally */
 img {
     max-width: 100%;
