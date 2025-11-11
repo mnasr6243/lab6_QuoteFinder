@@ -106,13 +106,33 @@ app.get('/searchByAuthor' , async (req, res) => {
     }
 });
 
-// Quotes between user input range route
-app.get("/quotesRange.ejs", async(req, res) => {
+// Search by category route
+app.get("/searchByCategory", async (req, res) => {
+    try {
+        const categoryId = req.query.categoryId;
+        if (!categoryId) return res.redirect("/");
 
-    let sql = "SELECT quoteId, quote, likes FROM `quotes` WHERE likes BETWEEN ? AND ? ORDER BY likes ASC;";
-    let sqlParams = [`${range1}`, `${range2}`];
-    const [row] = await pool.query(sql);
-    res.render("quotesRange.ejs", {result: row} );
+        const [rows] = await pool.query(`
+            SELECT
+                q.quote_id AS quoteId,
+                q.quote AS quote,
+                q.likes AS likes,
+                a.author_id AS authorId,
+                a.first_name AS firstName,
+                a.last_name AS lastName,
+                c.name AS categoryName
+            FROM quotes q
+            JOIN authors a ON q.author_id = a.author_id
+            JOIN categories c ON q.category_id = c.category_id
+            WHERE c.category_id = ?
+            ORDER BY q.likes DESC, q.quote ASC
+        `, [categoryId]);
+
+        res.render("results.ejs", { rows, title: "Results by Category" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server error; Error searching by category.");
+    }
 });
 
 
@@ -122,42 +142,6 @@ app.get('/api/authorInfo/:id', async (req, res) => {
     let sql = `SELECT * FROM q_authors WHERE authorId = ?`;           
     let [rows] = await conn.query(sql, [authorId]);
     res.send(rows)
-});
-
-
-// Author Portraits route
-app.get('/authorPics', async (req, res) => {
-    let sql = "SELECT portrait FROM `authors`;";
-    const [row] = await pool.query(sql);
-    res.render("authorPics.ejs", {result: row} );
-});
- 
-// All quotes alphabetical route
-app.get("/allQuotesAlphabetical", async(req, res) => {
-    let sql = "SELECT quoteId, quote, likes FROM `quotes` ORDER BY quote;";
-    const [row] = await pool.query(sql);
-    res.render("quotes.ejs", {result: row} );
-});
-
-// Quotes about life route
-app.get("/quotesAboutLife", async(req, res) => {
-    let sql = "SELECT quoteId, quote, likes FROM `quotes` WHERE quote LIKE '%life%';";
-    const [row] = await pool.query(sql);
-    res.render("quotes.ejs", {result: row} );
-});
-
-// Quotes between 50-100 route
-app.get("/quotes50_100", async(req, res) => {
-    let sql = "SELECT quoteId, quote, likes FROM `quotes` WHERE likes BETWEEN 50 AND 100 ORDER BY likes DESC;";
-    const [row] = await pool.query(sql);
-    res.render("quotes.ejs", {result: row} );
-});
-
-// Top 3 quotes route
-app.get("/top3Quotes", async(req, res) => {
-    let sql = "SELECT quoteId, quote, likes FROM `quotes` ORDER BY likes DESC LIMIT 3;";
-    const [row] = await pool.query(sql);
-    res.render("quotes.ejs", {result: row} );
 });
 
 // Database connection test route
