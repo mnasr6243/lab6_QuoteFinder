@@ -19,7 +19,7 @@ const pool = mysql.createPool({
     waitForConnections: true
 });
 
-//routes
+//Author route - displays all authors
 app.get('/', async (req, res) => {
     let authorsSQL = `SELECT authorId , firstName , lastName FROM authors`;
     const [authorsRows] = await pool.query(authorsSQL);
@@ -47,10 +47,12 @@ app.post('/addAuthor', async (req, res) => {
     res.render('addAuthor.ejs');
 });
 
+// Displays form to add new book
 app.get('/addBook', (req, res) => {
    res.render
 });
 
+// Search by keyword route
 app.get('/searchByKeyWord', async (req, res) => {
     // console.log(req);
     let keyword = req.query.keyword;
@@ -63,6 +65,7 @@ app.get('/searchByKeyWord', async (req, res) => {
     res.render('results.ejs', { rows });
 });
 
+// Search by author route
 app.get('/searchByAuthor' , async (req, res) => {
     let authorId = req.query.authorId;
 
@@ -89,10 +92,8 @@ app.get("/quotesRange.ejs", async(req, res) => {
 app.get('/api/authorInfo/:authorId', async (req, res) => {
     let authorId = req.params.authorId;
 
-
     let sql = `SELECT * FROM authors WHERE authorId = ?`;
     const [rows] = await pool.query(sql, [authorId]);
-
 
     res.send(rows);
 });
@@ -100,38 +101,39 @@ app.get('/api/authorInfo/:authorId', async (req, res) => {
 // Author Portraits route
 app.get('/authorPics', async (req, res) => {
     let sql = "SELECT portrait FROM `authors`;";
-    const [row] = await conn.query(sql);
+    const [row] = await pool.query(sql);
     res.render("authorPics.ejs", {result: row} );
 });
  
 // All quotes alphabetical route
 app.get("/allQuotesAlphabetical", async(req, res) => {
     let sql = "SELECT quoteId, quote, likes FROM `quotes` ORDER BY quote;";
-    const [row] = await conn.query(sql);
+    const [row] = await pool.query(sql);
     res.render("quotes.ejs", {result: row} );
 });
 
 // Quotes about life route
 app.get("/quotesAboutLife", async(req, res) => {
     let sql = "SELECT quoteId, quote, likes FROM `quotes` WHERE quote LIKE '%life%';";
-    const [row] = await conn.query(sql);
+    const [row] = await pool.query(sql);
     res.render("quotes.ejs", {result: row} );
 });
 
 // Quotes between 50-100 route
 app.get("/quotes50_100", async(req, res) => {
     let sql = "SELECT quoteId, quote, likes FROM `quotes` WHERE likes BETWEEN 50 AND 100 ORDER BY likes DESC;";
-    const [row] = await conn.query(sql);
+    const [row] = await pool.query(sql);
     res.render("quotes.ejs", {result: row} );
 });
 
 // Top 3 quotes route
 app.get("/top3Quotes", async(req, res) => {
     let sql = "SELECT quoteId, quote, likes FROM `quotes` ORDER BY likes DESC LIMIT 3;";
-    const [row] = await conn.query(sql);
+    const [row] = await pool.query(sql);
     res.render("quotes.ejs", {result: row} );
 });
 
+// Database connection test route
 app.get("/dbTest", async (req, res) => {
     try {
         const [rows] = await pool.query("SELECT CURDATE()");
@@ -140,7 +142,7 @@ app.get("/dbTest", async (req, res) => {
         console.error("Database error:", err);
         res.status(500).send("Database error!");
     }
-});//dbTest
+});
 
 app.listen(3000, () => {
     console.log("Express server running")

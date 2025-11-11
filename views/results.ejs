@@ -3,13 +3,11 @@
 <body class="text-center">
     <h1 class="bg-primary text-white p-4">Famous Quotes</h1>
 
-
     <% for (let i of rows) {%>
         "<%=i.quote%>"<br>
         <a class="authors" href="#" authorId="<%=i.authorId%>"> <%=i.firstName%> <%=i.lastName%></a>
         <br><hr>
     <% } %>
-
 
     <div id="authorInfo">
         <h2 id="authorName"></h2>
@@ -18,20 +16,15 @@
 
 
     <script>
-
-
         let authors = document.querySelectorAll(".authors");
-
 
         for (let i of authors) {
             authors.addEventListener("click" , getAuthorInfo);
         }
 
-
         function $(selector) {
             return document.querySelector(selector);
         }
-
 
         async function getAuthorInfo() {
             let authorId = this.getAttribute("authorId");
@@ -44,9 +37,6 @@
         }
     </script>
 
-
     <%- include("partials/footer.ejs")%>
 </body>
-
-
 </html>
