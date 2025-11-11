@@ -4,11 +4,10 @@ import mysql from 'mysql2/promise';
 const app = express();
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
-
 //for Express to get values using POST method
 app.use(express.urlencoded({ extended: true }));
 
-//setting up database connection pool
+// ========================================================= Database Setup =========================================================
 const pool = mysql.createPool({
     host: "s0znzigqvfehvff5.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
     user: "gx1or1xzatdre76g",
@@ -18,7 +17,24 @@ const pool = mysql.createPool({
     waitForConnections: true
 });
 
-//Author route - displays all authors
+// ========================================================= Helpers =========================================================
+async function getAuthorsAndCategories() {
+    const [authors] = await pool.query(`
+        SELECT author_id AS authorId, first_name AS firstName, last_name AS lastName
+        FROM authors 
+        ORDER BY last_name, first_name
+    `);
+
+    const [categories] = await pool.query(`
+        SELECT category_id AS categoryId, category_name AS categoryName
+        FROM categories 
+        ORDER BY category_name
+    `);
+    return { authors, categories };
+}
+// ========================================================= Routes =========================================================
+
+//Home route - Show search UI & dropdowns from database
 app.get('/', async (req, res) => {
     let authorsSQL = `SELECT authorId , firstName , lastName FROM authors`;
     const [authorsRows] = await pool.query(authorsSQL);
